@@ -1,42 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-// ── 小说配置 ──────────────────────────────────
-export const NOVELS = [
-  {
-    id: 'shou-hu-zhe',
-    dir: '谁是守护者',
-    title: '踩到一只林知远',
-    author: '小羊',
-    status: 'completed',
-    desc: '校园青春 · 从高一补习班踩到的那只鞋开始',
-    coverGradient: 'linear-gradient(135deg, #3a2a18 0%, #5c3d2e 50%, #8b5e3c 100%)',
-    coverEmoji: '📖',
-  },
-  {
-    id: 'kan-jian',
-    dir: '看见',
-    title: '看见',
-    author: '莫言',
-    status: 'serializing',
-    desc: '短篇连作集 · 十二个普通人被看见的瞬间',
-    coverGradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-    coverEmoji: '👁️',
-    // 短篇集模式：文件名即篇名，无章序号
-    shortStoryMode: true,
-  },
-  {
-    id: 'han-hun',
-    dir: '喊魂',
-    title: '喊魂',
-    author: '莫言',
-    status: 'serializing',
-    desc: '民俗悬疑 · 八篇单元剧，749局 × 中微子 × 民间怪谈',
-    coverGradient: 'linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 50%, #16213e 100%)',
-    coverEmoji: '🔮',
-  },
-];
-
 // ── 中文数字工具 ──────────────────────────────
 const CH_NUM = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10 };
 
@@ -74,32 +38,106 @@ const CN_DIGITS = ['零', '一', '二', '三', '四', '五', '六', '七', '八'
   '八十一', '八十二', '八十三', '八十四', '八十五', '八十六', '八十七', '八十八', '八十九', '九十',
   '九十一', '九十二', '九十三', '九十四', '九十五', '九十六', '九十七', '九十八', '九十九', '一百'];
 
-// 获取小说的基础目录 (在项目的根目录下)
+// ── 路径工具 ──────────────────────────────────
 const getNovelsDir = () => path.join(process.cwd(), 'novels_data');
 
-// 过滤非正文文件（排除 outline、concept 等管理文件）
+// 过滤非正文文件（排除 outline、concept、novel.json 等管理文件）
 function isContentFile(filename) {
   const lower = filename.toLowerCase();
-  if (lower === 'outline.md' || lower === 'concept.md') return false;
+  if (lower === 'outline.md' || lower === 'concept.md' || lower === 'novel.json') return false;
   if (lower.includes('outline') || lower.includes('concept')) return false;
-  // 排除 story-arcs, synopsis, characters 等管理文件
   if (/^(story-arcs|synopsis|characters|publish-log)/i.test(lower)) return false;
   return filename.endsWith('.md');
 }
 
+// ── 核心：文件系统驱动的小说发现 ──────────────
+
+/**
+ * 读取单个小说的 novel.json 配置
+ * 如果不存在或损坏，返回 null（容错跳过）
+ */
+function readNovelConfig(dirPath) {
+  const configPath = path.join(dirPath, 'novel.json');
+  if (!fs.existsSync(configPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 扫描 novels_data/ 目录，自动发现所有小说。
+ * 每个子目录需包含 novel.json，否则跳过。
+ * id 自动使用目录名。
+ *
+ * @returns {Promise<Array>} 小说列表，含章节统计
+ */
+export async function loadAllNovels() {
+  const novelsDir = getNovelsDir();
+  if (!fs.existsSync(novelsDir)) return [];
+
+  const entries = fs.readdirSync(novelsDir, { withFileTypes: true });
+  const novels = [];
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    const dirPath = path.join(novelsDir, entry.name);
+    const config = readNovelConfig(dirPath);
+    if (!config) continue; // 容错：没有 novel.json 的目录跳过
+
+    const dirName = entry.name;
+    const files = fs.readdirSync(dirPath).filter(isContentFile);
+
+    let chapterCount = 0, extraCount = 0;
+
+    if (config.shortStoryMode) {
+      // 短篇集：totalCount = 篇数
+      chapterCount = 0;
+      extraCount = 0;
+    } else {
+      chapterCount = files.filter(f => /^第.+章/.test(f)).length;
+      extraCount = files.filter(f => f.startsWith('番外')).length;
+    }
+
+    novels.push({
+      id: dirName,
+      dir: dirName,
+      ...config,
+      chapterCount,
+      extraCount,
+      totalCount: config.shortStoryMode ? files.length : chapterCount + extraCount,
+    });
+  }
+
+  return novels;
+}
+
+/**
+ * 根据小说 id（= 目录名）加载章节元数据
+ */
 export async function loadChaptersMeta(novelId) {
-  const novel = NOVELS.find(n => n.id === novelId);
-  if (!novel) return null;
+  const novelsDir = getNovelsDir();
+  const dirPath = path.join(novelsDir, novelId);
 
-  const dir = path.join(getNovelsDir(), novel.dir);
-  if (!fs.existsSync(dir)) return { novel, chapters: [] };
+  if (!fs.existsSync(dirPath)) return null;
 
-  const allFiles = fs.readdirSync(dir).filter(isContentFile);
+  const config = readNovelConfig(dirPath);
+  if (!config) return null;
+
+  const novel = {
+    id: novelId,
+    dir: novelId,
+    ...config,
+  };
+
+  const allFiles = fs.readdirSync(dirPath).filter(isContentFile);
 
   if (novel.shortStoryMode) {
     // 短篇集模式：按文件名字典排序，label = 文件名（去 .md）
     const files = allFiles
-      .filter(f => !f.startsWith('第'))  // 安全：排除意外带章节号的文件
+      .filter(f => !f.startsWith('第'))
       .sort((a, b) => a.localeCompare(b, 'zh'));
 
     const chapters = files.map((f, i) => {
@@ -141,6 +179,9 @@ export async function loadChaptersMeta(novelId) {
   return { novel, chapters };
 }
 
+/**
+ * 获取指定章节的完整内容
+ */
 export async function getChapterContent(novelId, idx) {
   const meta = await loadChaptersMeta(novelId);
   if (!meta || idx >= meta.chapters.length) return null;
@@ -163,23 +204,4 @@ export async function getChapterContent(novelId, idx) {
     total: meta.chapters.length,
     novel: meta.novel
   };
-}
-
-export async function loadAllNovels() {
-  return NOVELS.map(n => {
-    const dir = path.join(getNovelsDir(), n.dir);
-    if (!fs.existsSync(dir)) return { ...n, chapterCount: n.shortStoryMode ? 0 : 0, extraCount: 0, totalCount: 0 };
-
-    const files = fs.readdirSync(dir).filter(isContentFile);
-
-    if (n.shortStoryMode) {
-      // 短篇集：统计篇数
-      const totalCount = files.length;
-      return { ...n, chapterCount: 0, extraCount: 0, totalCount };
-    }
-
-    const mainChapters = files.filter(f => /^第.+章/.test(f)).length;
-    const extras = files.filter(f => f.startsWith('番外')).length;
-    return { ...n, chapterCount: mainChapters, extraCount: extras, totalCount: mainChapters + extras };
-  });
 }
