@@ -56,7 +56,7 @@ export default async function NovelPage({ params }) {
             <span className={`${styles.tag} ${styles[novel.status]}`}>
               {novel.status === "completed" ? "已完结" : "连载中"}
             </span>
-            <span className={styles.tag}>{chapters.length} 章</span>
+            <span className={styles.tag}>{chapters.length} {novel.shortStoryMode ? '篇' : '章'}</span>
           </div>
           <p className={styles.desc}>{novel.desc}</p>
           

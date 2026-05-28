@@ -32,8 +32,12 @@ export default async function Home() {
               <p className={styles.author}>{n.author} 作品</p>
               <p className={styles.desc}>{n.desc}</p>
               <p className={styles.meta}>
-                共 {n.chapterCount} 章正文
-                {n.extraCount > 0 ? ` + ${n.extraCount} 篇番外` : ""}
+                {n.shortStoryMode ? (
+                  `共 ${n.totalCount} 篇`
+                ) : (
+                  <>共 {n.chapterCount} 章正文
+                  {n.extraCount > 0 ? ` + ${n.extraCount} 篇番外` : ""}</>
+                )}
               </p>
             </div>
           </Link>
