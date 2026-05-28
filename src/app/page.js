@@ -1,66 +1,48 @@
-import Image from "next/image";
+import Link from "next/link";
+import { loadAllNovels } from "@/lib/novels";
+import Navbar from "@/components/Navbar";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default async function Home() {
+  const novels = await loadAllNovels();
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+    <main className={styles.main}>
+      <Navbar />
+      
+      <div className={styles.header}>
+        <h1 className={`${styles.title} font-serif`}>📚 小羊的小说书架</h1>
+        <p className={styles.subtitle}>云端阅读 · 随更随看</p>
+      </div>
+
+      <div className={styles.grid}>
+        {novels.map((n) => (
+          <Link href={`/novel/${n.id}`} key={n.id} className={`${styles.card} animate-fade-in`}>
+            <div
+              className={styles.cover}
+              style={{ background: n.coverGradient }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              <span className={styles.emoji}>{n.coverEmoji}</span>
+              <span className={`${styles.status} ${styles[n.status]}`}>
+                {n.status === "completed" ? "已完结" : "连载中"}
+              </span>
+            </div>
+            <div className={styles.cardBody}>
+              <h2 className={`${styles.cardTitle} font-serif`}>{n.title}</h2>
+              <p className={styles.author}>{n.author} 作品</p>
+              <p className={styles.desc}>{n.desc}</p>
+              <p className={styles.meta}>
+                共 {n.chapterCount} 章正文
+                {n.extraCount > 0 ? ` + ${n.extraCount} 篇番外` : ""}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <footer className={styles.footer}>
+        <p>共 {novels.length} 部作品</p>
+      </footer>
+    </main>
   );
 }

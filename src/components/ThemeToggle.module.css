@@ -1,0 +1,33 @@
+.toggleGroup {
+  display: flex;
+  background: var(--bg-sidebar-hover);
+  border-radius: 20px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.toggleBtn.active {
+  background: var(--bg-card);
+  color: var(--accent-main);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .toggleBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

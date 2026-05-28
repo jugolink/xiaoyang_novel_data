@@ -1,0 +1,31 @@
+.readBtn,
+.continueBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-main);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(212, 149, 107, 0.3);
+}
+
+.continueBtn {
+  background: var(--bg-sidebar-active);
+  color: var(--accent-main);
+  border: 1px solid var(--accent-main);
+  box-shadow: none;
+}
+
+.readBtn:hover,
+.continueBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(212, 149, 107, 0.4);
+}
+
+.continueBtn:hover {
+  background: var(--accent-main);
+  color: #fff;
+}

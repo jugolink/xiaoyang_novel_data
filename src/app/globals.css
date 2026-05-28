@@ -1,17 +1,93 @@
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Default Light Theme (Parchment-like) */
+  --bg-main: #faf8f5;
+  --bg-card: #ffffff;
+  --bg-sidebar: #f5f0e8;
+  --bg-sidebar-hover: #ede4d6;
+  --bg-sidebar-active: #f5e6d8;
+  
+  --text-main: #2c2416;
+  --text-secondary: #6b5e4a;
+  --text-muted: #9b9080;
+  
+  --accent-main: #d4956b;
+  --accent-light: #f5e6d8;
+  --accent-dark: #b87a50;
+  
+  --border-light: #e8e0d5;
+  --border-strong: #d0c0ab;
+  
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+
+  --glass-bg: rgba(250, 248, 245, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.4);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: "LXGW WenKai", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+  
+  --reader-font: var(--font-serif);
+  --reader-size: 1.1rem;
+  --reader-line-height: 1.9;
+  --reader-spacing: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="dark"] {
+  --bg-main: #1a1a1a;
+  --bg-card: #242424;
+  --bg-sidebar: #1f1f1f;
+  --bg-sidebar-hover: #2a2a2a;
+  --bg-sidebar-active: #3a2a1a;
+  
+  --text-main: #e0d8c8;
+  --text-secondary: #a09888;
+  --text-muted: #706858;
+  
+  --accent-main: #c08050;
+  --accent-light: #3a2a1a;
+  --accent-dark: #e0a070;
+  
+  --border-light: #333333;
+  --border-strong: #4a4a4a;
+  
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+
+  --glass-bg: rgba(26, 26, 26, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.05);
 }
 
-html {
-  height: 100%;
+[data-theme="green"] {
+  --bg-main: #e8f5e9;
+  --bg-card: #f1f8e9;
+  --bg-sidebar: #c8e6c9;
+  --bg-sidebar-hover: #a5d6a7;
+  --bg-sidebar-active: #81c784;
+  
+  --text-main: #1b5e20;
+  --text-secondary: #388e3c;
+  --text-muted: #4caf50;
+  
+  --accent-main: #2e7d32;
+  --accent-light: #c8e6c9;
+  --accent-dark: #1b5e20;
+  
+  --border-light: #c8e6c9;
+  --border-strong: #a5d6a7;
+  
+  --glass-bg: rgba(232, 245, 233, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
@@ -21,20 +97,11 @@ body {
 }
 
 body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  color: var(--text-main);
+  background: var(--bg-main);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
 }
 
 a {
@@ -42,8 +109,52 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Typography Utilities */
+.font-serif { font-family: var(--font-serif); }
+.font-sans { font-family: var(--font-sans); }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
