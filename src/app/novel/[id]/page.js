@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
   const meta = await loadChaptersMeta(id);
   if (!meta) return { title: "未找到小说" };
   return {
-    title: `${meta.novel.title} - 小羊的小说书架`,
+    title: `${meta.novel.title} - 墨语轩`,
     description: meta.novel.desc,
   };
 }

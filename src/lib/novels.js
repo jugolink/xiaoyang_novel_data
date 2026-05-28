@@ -102,7 +102,7 @@ export async function loadAllNovels() {
     }
 
     novels.push({
-      id: dirName,
+      id: config.slug || dirName,
       dir: dirName,
       ...config,
       chapterCount,
@@ -119,7 +119,19 @@ export async function loadAllNovels() {
  */
 export async function loadChaptersMeta(novelId) {
   const novelsDir = getNovelsDir();
-  const dirPath = path.join(novelsDir, novelId);
+
+  // 如果 novelId 不是直接的目录名，就扫描所有目录找到 slug 匹配的
+  const allDirs = fs.readdirSync(novelsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory());
+  let actualDir = novelId;
+  for (const d of allDirs) {
+    const cfg = readNovelConfig(path.join(novelsDir, d.name));
+    if (cfg && cfg.slug === novelId) {
+      actualDir = d.name;
+      break;
+    }
+  }
+  const dirPath = path.join(novelsDir, actualDir);
 
   if (!fs.existsSync(dirPath)) return null;
 
@@ -128,7 +140,7 @@ export async function loadChaptersMeta(novelId) {
 
   const novel = {
     id: novelId,
-    dir: novelId,
+    dir: actualDir,
     ...config,
   };
 
