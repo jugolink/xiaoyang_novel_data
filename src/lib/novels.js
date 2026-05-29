@@ -149,7 +149,6 @@ export async function loadChaptersMeta(novelId) {
   if (novel.shortStoryMode) {
     // 短篇集模式：按文件名字典排序，label = 文件名（去 .md）
     const files = allFiles
-      .filter(f => !f.startsWith('第'))
       .sort((a, b) => a.localeCompare(b, 'zh'));
 
     const chapters = files.map((f, i) => {
