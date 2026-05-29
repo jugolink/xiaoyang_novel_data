@@ -382,3 +382,43 @@
     order: -1;
   }
 }
+
+.copyFab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.copyFab:hover {
+  transform: scale(1.1);
+  color: var(--text-main);
+  box-shadow: var(--shadow-lg);
+}
+
+.copyFab.copied {
+  background: var(--accent-main);
+  color: white;
+  border-color: var(--accent-main);
+  transform: scale(1.1) rotate(360deg);
+}
+
+@media (max-width: 640px) {
+  .copyFab {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 44px;
+    height: 44px;
+  }
+}

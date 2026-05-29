@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ArrowLeft, ArrowRight, Settings } from "lucide-react";
+import { Menu, X, ArrowLeft, ArrowRight, Settings, Copy, Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -15,6 +15,7 @@ export default function ReaderClient({ chapter, chapters, novel }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(1.1);
   const [uiVisible, setUiVisible] = useState(true);
+  const [copied, setCopied] = useState(false);
   const router = useRouter();
 
   // Keyboard navigation
@@ -31,9 +32,28 @@ export default function ReaderClient({ chapter, chapters, novel }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [chapter.idx, chapters.length, novel.id, router]);
 
-  // Save reading progress
+  // Save reading progress & scroll position
   useEffect(() => {
     localStorage.setItem(`novel-progress-${novel.id}`, chapter.idx.toString());
+
+    // Restore scroll position
+    const savedScroll = localStorage.getItem(`novel-scroll-${novel.id}-${chapter.idx}`);
+    if (savedScroll) {
+      window.scrollTo({ top: parseInt(savedScroll, 10), behavior: "instant" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    let scrollTimeout;
+    const handleScroll = () => {
+      if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
+      scrollTimeout = requestAnimationFrame(() => {
+        localStorage.setItem(`novel-scroll-${novel.id}-${chapter.idx}`, window.scrollY.toString());
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [novel.id, chapter.idx]);
 
   // Read preferences
@@ -76,6 +96,16 @@ export default function ReaderClient({ chapter, chapters, novel }) {
     const isRightSwipe = distance < -minSwipeDistance;
     if (isLeftSwipe && hasNext) router.push(`/novel/${novel.id}/${chapter.idx + 1}`);
     if (isRightSwipe && hasPrev) router.push(`/novel/${novel.id}/${chapter.idx - 1}`);
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(chapter.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy content:", err);
+    }
   };
 
   return (
@@ -212,6 +242,15 @@ export default function ReaderClient({ chapter, chapters, novel }) {
           </div>
         </div>
       </main>
+
+      {/* Floating Copy Button */}
+      <button 
+        className={`${styles.copyFab} ${copied ? styles.copied : ""} animate-fade-in`}
+        onClick={handleCopy}
+        title="复制本章全篇"
+      >
+        {copied ? <Check size={20} /> : <Copy size={20} />}
+      </button>
     </div>
   );
 }
