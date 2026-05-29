@@ -9,9 +9,9 @@ export default async function Home() {
   return (
     <main className={styles.main}>
       <Navbar />
-      
+
       <div className={styles.header}>
-        <h1 className={`${styles.title} font-serif`}>📚 墨语轩</h1>
+        <h1 className={`${styles.title} font-serif`}>📚 咩咩书屋</h1>
         <p className={styles.subtitle}>云端阅读 · 随更随看</p>
       </div>
 

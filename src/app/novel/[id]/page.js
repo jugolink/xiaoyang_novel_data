@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
   const meta = await loadChaptersMeta(id);
   if (!meta) return { title: "未找到小说" };
   return {
-    title: `${meta.novel.title} - 墨语轩`,
+    title: `${meta.novel.title} - 咩咩书屋`,
     description: meta.novel.desc,
   };
 }
@@ -59,7 +59,7 @@ export default async function NovelPage({ params }) {
             <span className={styles.tag}>{chapters.length} {novel.shortStoryMode ? '篇' : '章'}</span>
           </div>
           <p className={styles.desc}>{novel.desc}</p>
-          
+
           <ContinueReadingBtn novelId={novel.id} chapters={chapters} />
         </div>
       </div>
