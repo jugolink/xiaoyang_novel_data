@@ -23,7 +23,7 @@ export default function Comments() {
     script.setAttribute("data-repo", "jugolink/xiaoyang_giscus");
     script.setAttribute("data-repo-id", "R_kgDOSq-m7w");
     script.setAttribute("data-category", "Announcements");
-    script.setAttribute("data-category-id", "YOUR_CATEGORY_ID");
+    script.setAttribute("data-category-id", "DIC_kwDOSq-m784C-D4N");
 
     script.setAttribute("data-mapping", "pathname"); // 根据页面 URL 区分评论区
     script.setAttribute("data-strict", "0");
