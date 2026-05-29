@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Menu, X, ArrowLeft, ArrowRight, Settings, Copy, Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-import remarkGfm from "remark-gfm";
 import ThemeToggle from "./ThemeToggle";
+import Comments from "./Comments";
 import styles from "./ReaderClient.module.css";
 import { useRouter } from "next/navigation";
 
@@ -240,6 +240,9 @@ export default function ReaderClient({ chapter, chapters, novel }) {
               <span />
             )}
           </div>
+          
+          {/* 评论区 */}
+          <Comments />
         </div>
       </main>
 

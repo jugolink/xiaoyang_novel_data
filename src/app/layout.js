@@ -1,5 +1,6 @@
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import PWARegistrar from '@/components/PWARegistrar';
 
 export const metadata = {
   title: '小羊的小说书架',
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="zh-CN" suppressHydrationWarning>
       <body>
         <ThemeProvider>
+          <PWARegistrar />
           {children}
         </ThemeProvider>
       </body>

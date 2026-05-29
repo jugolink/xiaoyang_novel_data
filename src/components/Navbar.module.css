@@ -72,6 +72,21 @@
   gap: 1rem;
 }
 
+.searchBtn {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.searchBtn:hover {
+  background: var(--bg-sidebar-hover);
+  color: var(--accent-main);
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 0.5rem 1rem;

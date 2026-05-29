@@ -1,11 +1,18 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import SearchModal from "./SearchModal";
 import styles from "./Navbar.module.css";
-import { BookOpen, ArrowLeft } from "lucide-react";
+import { BookOpen, ArrowLeft, Search } from "lucide-react";
 
 export default function Navbar({ title, backUrl, backLabel }) {
+  const [searchOpen, setSearchOpen] = useState(false);
+
   return (
-    <header className={`${styles.navbar} glass`}>
+    <>
+      <header className={`${styles.navbar} glass`}>
       <div className={styles.container}>
         <div className={styles.left}>
           {backUrl ? (
@@ -22,9 +29,19 @@ export default function Navbar({ title, backUrl, backLabel }) {
           {backUrl && title && <span className={styles.titleWithBack}>{title}</span>}
         </div>
         <div className={styles.actions}>
+          <button 
+            className={styles.searchBtn} 
+            onClick={() => setSearchOpen(true)}
+            aria-label="搜索"
+            title="搜索"
+          >
+            <Search size={20} />
+          </button>
           <ThemeToggle />
         </div>
       </div>
     </header>
+    <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }
